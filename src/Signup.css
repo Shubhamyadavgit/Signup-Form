@@ -110,3 +110,48 @@ button:active {
     font-size: 0.9rem;
   }
 }
+.password-field {
+  position: relative;
+}
+
+.password-container {
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 30px; /* Add space for the icon */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 30px;
+  cursor: pointer;
+}
+.login-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.login-container h4 {
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+.login-container h4 span {
+  color: #007bff;
+}
+
+.login-container h4 span a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+}
+
+.login-container h4 span a:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
