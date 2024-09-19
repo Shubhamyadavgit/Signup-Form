@@ -70,8 +70,8 @@ const Signup = () => {
       toast.error('Invalid phone');
       return;
     }
-    if(!validatePassword(data.password)){
-      toast.error('Invalid password');
+    if(!validatePassword(data.password) || data.password.length < 10 || data.password.length > 20){
+      toast.error('Password must be at least 10 characters long and contain at least one number and one uppercase letter and one special character');
       return;
     }
     if(data.password !== data.cpassword){
