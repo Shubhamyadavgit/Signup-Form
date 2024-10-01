@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import "./Signup.css";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import {NavLink} from 'react-router-dom'
-const Signup = () => {
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { NavLink } from "react-router-dom";
+import emailjs from "emailjs-com";
 
-  const[showPassword,setShowPassword] = useState(false);
+const Signup = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
   const [data, setData] = useState({
     name: "",
     lastname: "",
@@ -17,69 +22,67 @@ const Signup = () => {
     cpassword: "",
   });
 
-  const validateName = (name)=>{
-    const nameRegex = /^[A-Za-z]+$/;
-    return nameRegex.test(name);
-  }
-
-  const validateEmail = (email)=>{
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-  }
-
-  const validatePhone = (phone)=>{
-    const phoneRegex = /^[0-9]{10}$/;
-    return phoneRegex.test(phone);
-  }
-  const validatePassword = (password)=>{
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/;
-    return passwordRegex.test(password);
-  }
+  const validateName = (name) => /^[A-Za-z]+$/.test(name);
+  const validateEmail = (email) =>
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+  const validatePhone = (phone) => /^[0-9]{10}$/.test(phone);
+  const validatePassword = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: value,
-    });
+    setData({ ...data, [name]: value });
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const allFieldsFilled = Object.values(data).every(field => field.trim() !== "");
 
+    if (!otpVerified) {
+      toast.error("Please verify the OTP before submitting.");
+      return;
+    }
+
+    const allFieldsFilled = Object.values(data).every(
+      (field) => field.trim() !== ""
+    );
     if (!allFieldsFilled) {
-      toast.error('Please fill out all fields');
+      toast.error("Please fill out all fields");
       return;
     }
 
-    if(!validateName(data.name)){
-      toast.error('Invalid name');
+    if (!validateName(data.name)) {
+      toast.error("Invalid name");
       return;
     }
-    if(!validateName(data.lastname)){
-      toast.error('Invalid lastname');
+    if (!validateName(data.lastname)) {
+      toast.error("Invalid lastname");
       return;
     }
-    if(!validateEmail(data.email)){
-      toast.error('Invalid email');
+    if (!validateEmail(data.email)) {
+      toast.error("Invalid email");
       return;
     }
-    if(!validatePhone(data.phone)){
-      toast.error('Invalid phone');
+    if (!validatePhone(data.phone)) {
+      toast.error("Invalid phone");
       return;
     }
-    if(!validatePassword(data.password) || data.password.length < 10 || data.password.length > 20){
-      toast.error('Password must be at least 10 characters long and contain at least one number and one uppercase letter and one special character');
+    if (
+      !validatePassword(data.password) ||
+      data.password.length < 10 ||
+      data.password.length > 20
+    ) {
+      toast.error(
+        "Password must be 10-20 characters and include a number and uppercase letter"
+      );
       return;
     }
-    if(data.password !== data.cpassword){
-        toast.error('Passwords do not match');
-        return;
+    if (data.password !== data.cpassword) {
+      toast.error("Passwords do not match");
+      return;
     }
-    toast.success("Submitted successfully!")
-    console.log("Form data submitted:", data); 
+
+    toast.success("Submitted successfully!");
+    console.log("Form data submitted:", data);
     setData({
       name: "",
       lastname: "",
@@ -89,6 +92,58 @@ const Signup = () => {
       gender: "",
       cpassword: "",
     });
+    setOtp("");
+    setOtpVerified(false);
+    setOtpSent(false);
+  };
+
+  const sendOtp = () => {
+    if (!validateEmail(data.email)) {
+      toast.error("Please enter a valid email before sending OTP");
+      return;
+    }
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // Generate 4-digit OTP
+    setGeneratedOtp(otp);
+
+    // Sending the email using EmailJS
+    const emailParams = {
+      user_email: data.email,
+      user_otp: otp,
+      to_email: "Shubham",
+      message:
+        "Your OTP for the verification is :  " +
+        otp +
+        "Please enter this otp to verify email and dont share the otp with anyone.",
+    };
+
+    emailjs
+      .send(
+        "service_a2y363p",
+        "template_irjscfr",
+        emailParams,
+        "kk7iXWfzsEPtNfufG"
+      )
+      .then(
+        (response) => {
+          console.log("SUCCESS!", response.status, response.text);
+          setOtpSent(true);
+          toast.success(`OTP sent to ${data.email}`);
+        },
+        (error) => {
+          console.error("FAILED...", error);
+          toast.error("Failed to send OTP. Please try again.");
+        }
+      );
+  };
+
+  const verifyOtp = () => {
+    if (otp === generatedOtp) {
+      setOtpVerified(true);
+      toast.success("OTP verified successfully");
+    } else {
+      toast.error("Invalid OTP");
+    }
   };
 
   return (
@@ -119,18 +174,40 @@ const Signup = () => {
             required
           />
         </div>
-        <div>
+        <div className="email">
           <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={data.email}
-            onChange={handleChange}
-            placeholder="Enter Your Email"
-            required
-          />
+          <div className="email-input-container">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={data.email}
+              onChange={handleChange}
+              placeholder="Enter Your Email"
+              required
+            />
+            <button type="button" onClick={sendOtp} disabled={otpSent}>
+              {otpSent ? "OTP Sent" : "Send OTP"}
+            </button>
+          </div>
         </div>
+        {otpSent && (
+          <div className="verify">
+            <label htmlFor="otp">Enter OTP</label>
+            <div className="otp-input-container">
+              <input
+                type="text"
+                id="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+              />
+              <button type="button" onClick={verifyOtp}>
+                Verify OTP
+              </button>
+            </div>
+          </div>
+        )}
 
         <div>
           <label htmlFor="phone">Phone</label>
@@ -173,15 +250,18 @@ const Signup = () => {
               placeholder="Enter Password"
               required
             />
-            <span className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
-            <VisibilityIcon/>
+            <span
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <VisibilityIcon />
             </span>
           </div>
         </div>
         <div className="password-field">
           <label htmlFor="cpassword">Confirm Password</label>
           <input
-            type={showPassword ?  "text" : "password"}
+            type={showPassword ? "text" : "password"}
             id="cpassword"
             name="cpassword"
             value={data.cpassword}
@@ -191,17 +271,24 @@ const Signup = () => {
           />
         </div>
 
-        <button type="submit" onClick={handleSubmit}>
+        <button
+          type="submit"
+          disabled={!otpVerified}
+          className={otpVerified ? "btn-active" : "btn-inactive"}
+        >
           Submit
         </button>
+
         <div className="login-container">
-          <h4>Already have an account ? <span><NavLink to="/login"> Click here</NavLink></span></h4>
+          <h4>
+            Already have an account?{" "}
+            <span>
+              <NavLink to="/login">Click here</NavLink>
+            </span>
+          </h4>
         </div>
       </form>
-      <ToastContainer 
-        position="top-center"
-        autoClose={5000}
-      />
+      <ToastContainer position="top-center" autoClose={5000} />
     </div>
   );
 };

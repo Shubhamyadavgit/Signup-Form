@@ -83,6 +83,24 @@ button {
   font-weight: 500;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
+.email-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.email-input-container input {
+  width: 110%; /* Adjust this value as per your layout */
+}
+
+.email-input-container button {
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 10px;
+  width: 30%; /* Adjust this value as per your layout */
+  margin-bottom: 18px;
+  height: 45px;
+}
 
 button:hover {
   background-color: #218838; 
@@ -155,4 +173,34 @@ button:active {
   text-decoration: underline;
   color: #0056b3;
 }
+/* Button styling */
+.btn-active {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  cursor: pointer;
+}
 
+.btn-inactive {
+  background-color: grey;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.otp-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.otp-input-container input {
+  width: 90%; /* Adjust the width as needed */
+}
+
+.otp-input-container button {
+  margin-left: 10px;
+  width: 25%; /* Adjust the width as needed */
+  height: 45px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
